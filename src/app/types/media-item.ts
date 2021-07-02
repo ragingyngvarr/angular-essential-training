@@ -6,6 +6,6 @@ export interface MediaItem {
     medium: Medium;
     category: string;
     year: number;
-    watchedOn: Date;
+    watchedOn: number;
     isFavorite: boolean;
 }
