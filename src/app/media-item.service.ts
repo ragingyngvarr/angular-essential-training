@@ -1,67 +1,39 @@
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MediaItem } from './types/media-item';
+import { map, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MediaItemService {
-  private mediaItems: Array<MediaItem> = [
-    {
-      id: 1,
-      name: 'Firebug',
-      medium: 'Series',
-      category: 'Science Fiction',
-      year: 2010,
-      watchedOn: 1294166565384,
-      isFavorite: false
-    },
-    {
-      id: 2,
-      name: 'The Small Tall',
-      medium: 'Movies',
-      category: 'Comedy',
-      year: 2015,
-      watchedOn: null,
-      isFavorite: true
-    }, {
-      id: 3,
-      name: 'The Redemption',
-      medium: 'Movies',
-      category: 'Action',
-      year: 2016,
-      watchedOn: null,
-      isFavorite: false
-    }, {
-      id: 4,
-      name: 'Hoopers',
-      medium: 'Series',
-      category: 'Drama',
-      year: null,
-      watchedOn: null,
-      isFavorite: true
-    }, {
-      id: 5,
-      name: 'Happy Joe: Cheery Road',
-      medium: 'Movies',
-      category: 'Action',
-      year: 2015,
-      watchedOn: 1457166565384,
-      isFavorite: false
-    }
-  ];
+  constructor(private httpClient: HttpClient) {}
 
-  get items(): Array<MediaItem> {
-    return this.mediaItems;
+  get(medium) {
+    const getOptions= {
+      params: { 
+        medium,
+      }
+    }; 
+    return this.httpClient.get<MediaItemsResponse>('mediaitems', getOptions)
+      .pipe(map(response => { return response.mediaItems; }), catchError(this.handleError));
   }
 
   add(mediaItem: MediaItem) {
-    this.mediaItems.push(mediaItem);
+    return this.httpClient.post('mediaitem', mediaItem).pipe(catchError(this.handleError));
   }
 
   delete(mediaItem: MediaItem) {
-    const index = this.mediaItems.findIndex((mi) => mi.id === mediaItem.id);
-    if (index >= 0) {
-      this.mediaItems.splice(index, 1);
-    }
+    return this.httpClient.delete(`mediaitems/${mediaItem.id}`).pipe(catchError(this.handleError));
   }
+
+  private handleError(error: HttpErrorResponse) {
+    console.log(error);
+    return throwError('An http error occured');
+  }
+}
+
+interface MediaItemsResponse {
+  mediaItems: Array<MediaItem>;
 }
