@@ -5,10 +5,8 @@ import { MediaItem } from './types/media-item';
   name: 'categoryList'
 })
 export class CategoryListPipe implements PipeTransform {
-
   transform(mediaItems: Array<MediaItem>): any {
     const categories = [...new Set(mediaItems.map((mi) => mi.category))];
-    return categories.join(', ');
+    return categories;
   }
-
 }
